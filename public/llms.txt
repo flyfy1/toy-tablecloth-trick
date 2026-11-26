@@ -44,7 +44,7 @@ Yes. The hiss of the silk, the clink of each dish and every crash are synthesise
 English, 简体中文 (Simplified Chinese), Español, Français and 日本語 (Japanese). The language is picked automatically from your browser settings; any other language falls back to English.
 
 **Who made it?**
-Integ Life (integ.life). Tablecloth Trick is one of eleven small stress-relief toys, together with Charge Burst, Void Harvest, Glass Smash, Chain Pop, Knock on Wood, Lap Cat, Squishy Bun, Scratch That, Peel Off, Give It a Twirl. More games are at games.integ.life.
+Integ Life (integ.life). Tablecloth Trick is one of twelve small stress-relief toys, together with Charge Burst, Void Harvest, Glass Smash, Chain Pop, Knock on Wood, Lap Cat, Squishy Bun, Scratch That, Peel Off, Give It a Twirl, Smooth as Silk. More games are at games.integ.life.
 
 **Is any personal data collected?**
 No account and no personal data. At most, anonymous usage statistics (page views and play counts) are collected.
@@ -61,4 +61,5 @@ No account and no personal data. At most, anonymous usage statistics (page views
 - [Scratch That](https://scratch.integ.life/): Scratch the silver off a card. Win a nap.
 - [Peel Off](https://peel.integ.life/): Peel the film off a brand-new phone. Then try to put the film down.
 - [Give It a Twirl](https://twirl.integ.life/): A new skirt on a dress form. Swipe to spin it and watch the hem fly out flat.
+- [Smooth as Silk](https://silk.integ.life/): A silk curtain at an open window. Drag it, let go, watch it fall back.
 - [Integ Games](https://games.integ.life/): more browser games
