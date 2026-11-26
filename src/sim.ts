@@ -295,6 +295,7 @@ export class World {
 
   /** advance by dt (seconds), S substeps */
   step(dt: number) {
+    if (!(dt > 0)) return // a zero or negative frame (rAF time before the last stamp) would divide by zero
     dt = Math.min(dt, 1 / 30)
     const S = this.S
     const h = (this.h = dt / S)

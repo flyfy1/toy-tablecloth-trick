@@ -211,7 +211,7 @@ export function startGame(cv: HTMLCanvasElement, hooks: GameHooks) {
     const pt = [0, 0, 0]
     for (let i = 0; i < world.cloth.n; i++) {
       const a = i * 3
-      if (x[a + 1] > 0.02 && x[a + 2] > -0.01) continue
+      if (x[a + 1] > 0.02) continue // only the part in front of the near edge
       cam.project(x[a], x[a + 1], x[a + 2], pt)
       x0 = Math.min(x0, pt[0])
       x1 = Math.max(x1, pt[0])
@@ -293,6 +293,7 @@ export function startGame(cv: HTMLCanvasElement, hooks: GameHooks) {
   const frame = (now: number) => {
     raf = requestAnimationFrame(frame)
     const dt = Math.min(1 / 30, (now - last) / 1000)
+    if (dt <= 0) return
     if (frozen) {
       last = now
       return
