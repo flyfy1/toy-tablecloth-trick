@@ -1,0 +1,64 @@
+# Tablecloth Trick
+
+> A family table laid with a silk cloth: a tea cup, Mum's bowls, a whole braised fish, Grandma's thermos and the family heirloom. Grab the hem and flick it down. Fast enough and the cloth slides out while everything rattles and stays; too slow and the whole table rides over the edge. Six tables, each harder than the last, and a cat. A tiny cloth-physics toy, no sign-up.
+
+Tablecloth Trick (抽桌布 (zh-CN), El Truco del Mantel (es), Le Coup de la Nappe (fr), テーブルクロス引き (ja)) is a free browser toy at https://yoink.integ.life/ by Integ Life. It opens straight into play: no sign-up, no download, no ads, no tutorial. It works with a mouse or a touchscreen on phones, tablets and computers.
+
+## How to play
+
+1. Put a finger (or the mouse) on the hem of the cloth hanging over the near edge of the table.
+2. Flick it down hard and let go. The faster the flick, the less the things on the table move. A slow drag takes everything with it.
+3. Perfect means the cloth is off, nothing broke and nothing slid more than 3 cm. Then the next table is laid, with more on it.
+4. Table six has the family heirloom on it. A firm pull is not enough there.
+
+## Facts
+
+- URL: https://yoink.integ.life/
+- Price: free
+- Platforms: any modern web browser (desktop and mobile)
+- Languages: English, 简体中文 (Simplified Chinese), Español, Français and 日本語 (Japanese), picked from the browser language (default English)
+- Sound: synthesised live with the Web Audio API; vibration on Android
+- Made by: Integ Life (https://integ.life/), first published 2026-11-26
+
+## FAQ
+
+**Does the tablecloth trick really work?**
+Yes, and this toy simulates why. Friction can only push a dish so hard, so if the cloth leaves quickly enough the dish only gets a short nudge and barely moves. A slow pull gives friction time to drag it along. Silk helps because it is slippery.
+
+**Why did everything fall off?**
+The pull was too slow. Below about one metre a second the dishes ride the cloth all the way over the edge. Flick it.
+
+**Why does the heirloom fall over when the bowls are fine?**
+It is tall and narrow, so the same tug that slides a bowl a little tips the vase. It needs a faster pull than anything else on the table.
+
+**Is the cat part of the trick?**
+The cat does not move. The cloth leaves from under it. Sometimes, afterwards, it pushes a cup off the table anyway; tap the cup to stop it.
+
+**Is Tablecloth Trick free?**
+Yes. It is free, with no sign-up, no download and no ads. It runs in any modern browser on phones, tablets and computers.
+
+**Does it have sound and vibration?**
+Yes. The hiss of the silk, the clink of each dish and every crash are synthesised live with the Web Audio API; there are no audio files. On Android phones the pull is also felt as ticks of vibration, and a break as a thud.
+
+**Which languages does it support?**
+English, 简体中文 (Simplified Chinese), Español, Français and 日本語 (Japanese). The language is picked automatically from your browser settings; any other language falls back to English.
+
+**Who made it?**
+Integ Life (integ.life). Tablecloth Trick is one of eleven small stress-relief toys, together with Charge Burst, Void Harvest, Glass Smash, Chain Pop, Knock on Wood, Lap Cat, Squishy Bun, Scratch That, Peel Off, Give It a Twirl. More games are at games.integ.life.
+
+**Is any personal data collected?**
+No account and no personal data. At most, anonymous usage statistics (page views and play counts) are collected.
+
+## Related
+
+- [Charge Burst](https://charge.integ.life/): Hold to annoy a pufferfish until it puffs up and blows its spines off.
+- [Void Harvest](https://void.integ.life/): Your cursor is a black hole: swallow the socks, receipts, client emails and Monday. Sometimes it gives one sock back.
+- [Glass Smash](https://smash.integ.life/): Smash a pane of glass with the word you hate written on it.
+- [Chain Pop](https://pop.integ.life/): A sheet of parcel bubble wrap that never runs out. One bubble refuses to pop.
+- [Knock on Wood](https://knock.integ.life/): Tap a wooden fish. Merit +1.
+- [Lap Cat](https://purr.integ.life/): Pet a soft, purring cat on your screen. Mind the belly.
+- [Squishy Bun](https://squish.integ.life/): Squeeze a soft mochi bun. It slowly forgives you.
+- [Scratch That](https://scratch.integ.life/): Scratch the silver off a card. Win a nap.
+- [Peel Off](https://peel.integ.life/): Peel the film off a brand-new phone. Then try to put the film down.
+- [Give It a Twirl](https://twirl.integ.life/): A new skirt on a dress form. Swipe to spin it and watch the hem fly out flat.
+- [Integ Games](https://games.integ.life/): more browser games
