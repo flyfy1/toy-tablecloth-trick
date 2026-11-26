@@ -830,6 +830,12 @@ export function yoinkRival(): { set: number; k: number } | null {
   return m ? { set: Number(m[1]), k: Number(m[2]) } : null
 }
 
+/** peel's objects, in the order the game numbers them (peak data `it` and `left`, the link's ?obj=). */
+export const PEEL_ITEMS = ['phone', 'steel', 'remote', 'cam', 'watch', 'car', 'micro', 'fridge', 'laptop', 'cabinet'] as const
+/** How many of them are built so far: the kinds row's total. */
+const PEEL_LIVE = 7
+const peelLeft = () => PEEL_ITEMS[store.peak?.data.left ?? 2] ?? 'remote'
+
 /** peel: 撕膜证明 / Certificate of Peeling. */
 const PEEL = {
   en: {
@@ -840,8 +846,14 @@ const PEEL = {
     v_remote: '“The remote was like that when I found it”',
     v_one: '“One pull. No tearing.”',
     v_else: '“Crooked still counts”',
+    kinds: ['Kinds', '{d} of {t}'],
+    v_cam: '“It was never my shaky hands”',
+    v_watch: '“The film always said 10:09”',
+    v_car: '“The dealer said it was factory-fitted”',
+    v_micro: '“The bit under the trim stays”',
     small: 'Remove before use. No liability after removal.',
-    done: 'Peeled {n} films today. Mum does not know. I left you the remote:',
+    done: 'Peeled {n} films today. Mum does not know. I left you {obj}:',
+    done1: 'Peeled one film today. Mum does not know. I left you {obj}:',
     invite: 'There is a film waiting to be peeled. Mum is out:',
   },
   'zh-CN': {
@@ -852,8 +864,14 @@ const PEEL = {
     v_remote: '「遥控器的膜不是我撕的」',
     v_one: '「一口气，没断」',
     v_else: '「撕歪了也算」',
+    kinds: ['品类', '{d} / {t} 种'],
+    v_cam: '「原来不是我手抖」',
+    v_watch: '「膜上的时间一直是 10:09」',
+    v_car: '「4S 店说是原厂的」',
+    v_micro: '「缝里那一圈，就这样吧」',
     small: '撕前请勿使用。撕后概不负责。',
-    done: '今天撕了 {n} 张膜，我妈还不知道。遥控器那张留给你：',
+    done: '今天撕了 {n} 张膜，我妈还不知道。{obj}那张留给你：',
+    done1: '今天撕了 1 张膜，我妈还不知道。{obj}那张留给你：',
     invite: '有张膜等你撕。你妈不在：',
   },
   es: {
@@ -864,8 +882,14 @@ const PEEL = {
     v_remote: '«El mando ya estaba así»',
     v_one: '«De un tirón. Sin romperse.»',
     v_else: '«Torcido también cuenta»',
+    kinds: ['Tipos', '{d} de {t}'],
+    v_cam: '«No era mi pulso»',
+    v_watch: '«El plástico siempre marcó las 10:09»',
+    v_car: '«En el concesionario dijeron que venía de fábrica»',
+    v_micro: '«Lo de debajo del marco se queda»',
     small: 'Retirar antes de usar. Sin responsabilidad después.',
-    done: 'Hoy he despegado {n} láminas. Mamá no lo sabe. Te he dejado la del mando:',
+    done: 'Hoy he quitado {n} plásticos. Mamá no lo sabe. Te dejo {obj}:',
+    done1: 'Hoy he quitado un plástico. Mamá no lo sabe. Te dejo {obj}:',
     invite: 'Hay una lámina esperando a que la despegues. Mamá ha salido:',
   },
   fr: {
@@ -876,8 +900,14 @@ const PEEL = {
     v_remote: '« La télécommande était déjà nue »',
     v_one: '« D’un geste. Sans déchirer. »',
     v_else: '« De travers, ça compte aussi »',
+    kinds: ['Sortes', '{d} sur {t}'],
+    v_cam: '« Ce n’était pas moi qui tremblais »',
+    v_watch: '« Le film a toujours indiqué 10 h 09 »',
+    v_car: '« Le concessionnaire a dit que c’était d’origine »',
+    v_micro: '« Le bout sous la baguette reste »',
     small: 'À retirer avant usage. Aucune responsabilité après.',
-    done: 'J’ai retiré {n} films aujourd’hui. Maman ne sait rien. Je vous ai laissé la télécommande :',
+    done: '{n} films retirés aujourd’hui. Maman ne sait rien. Je vous laisse {obj} :',
+    done1: 'Un film retiré aujourd’hui. Maman ne sait rien. Je vous laisse {obj} :',
     invite: 'Un film attend d’être retiré. Maman est sortie :',
   },
   ja: {
@@ -888,11 +918,118 @@ const PEEL = {
     v_remote: '「リモコンのフィルムは最初からなかった」',
     v_one: '「一気に、切れずに」',
     v_else: '「曲がってもはがしたうち」',
+    kinds: ['種類', '{d} / {t}'],
+    v_cam: '「手ブレじゃなかった」',
+    v_watch: '「フィルムはずっと 10:09」',
+    v_car: '「ディーラーは純正だと言った」',
+    v_micro: '「ふちの下はそのまま」',
     small: '使用前にはがしてください。はがした後は責任を負いません。',
-    done: '今日はフィルムを {n} 枚はがしました。母はまだ知りません。リモコンの分はあなたに：',
+    done: '今日は {n} 枚はがした。母はまだ知らない。{obj}のぶんは残しておいた：',
+    done1: '今日は 1 枚はがした。母はまだ知らない。{obj}のぶんは残しておいた：',
     invite: 'はがされ待ちのフィルムがあります。母は留守です：',
   },
 } satisfies Record<Locale, Record<string, string | string[]>>
+
+/** twirl: 新裙试转单 / Twirl Test Slip, the tailor's slip for the mandatory first twirl. */
+const TWIRL = {
+  en: {
+    title: 'Twirl Test Slip',
+    fabric: ['Fabric', '{fabric}'],
+    turns: ['In one go', '{t} turns'],
+    peak: ['Top speed', '{p} turns a second'],
+    bloom: ['Fully open', '{b} s'],
+    rival: ['Theirs', '{r} turns'],
+    small: 'The shop does not supply travel-sickness pills.',
+    v_dz: '“The dress form got dizzy. The skirt is fine.”',
+    v_pk: '“It has pockets. Had.”',
+    v_mamian: '“Every pleat open”',
+    v_tulle: '“The glitter stays for life”',
+    v_wr: '“I stopped. The skirt did not.”',
+    v_else: '“New skirt. Twirled first, as required.”',
+    done: 'I spun a new skirt {t} times in one go. Beat that:',
+    invite: 'There is a new skirt here. You know what to do first:',
+    back: 'Send your turns back',
+    chiffon: 'Chiffon', denim: 'Denim', mamian: 'Mamianqun', tulle: 'Tulle',
+  },
+  'zh-CN': {
+    title: '新裙试转单',
+    fabric: ['面料', '{fabric}'],
+    turns: ['一口气', '{t} 圈'],
+    peak: ['最快', '每秒 {p} 圈'],
+    bloom: ['全开', '{b} 秒'],
+    rival: ['对手', '{r} 圈'],
+    small: '本店不提供晕车药。',
+    v_dz: '「人台转晕了，裙子没事」',
+    v_pk: '「有口袋，东西全飞了」',
+    v_mamian: '「褶子全开」',
+    v_tulle: '「亮片会跟我一辈子」',
+    v_wr: '「我停了，裙子没停」',
+    v_else: '「新裙子，按规定先转了一圈」',
+    done: '我把一条新裙子一口气转了 {t} 圈。你来：',
+    invite: '这儿有条新裙子。先转一圈，这是规定：',
+    back: '把圈数甩回去',
+    chiffon: '雪纺', denim: '牛仔', mamian: '马面裙', tulle: '纱裙',
+  },
+  es: {
+    title: 'Ficha de prueba de vuelo',
+    fabric: ['Tejido', '{fabric}'],
+    turns: ['Del tirón', '{t} vueltas'],
+    peak: ['Velocidad máxima', '{p} vueltas por segundo'],
+    bloom: ['Abierta del todo', '{b} s'],
+    rival: ['La suya', '{r} vueltas'],
+    small: 'La casa no facilita pastillas para el mareo.',
+    v_dz: '«El maniquí se ha mareado. La falda, perfecta.»',
+    v_pk: '«Tiene bolsillos. Lo de dentro ya no.»',
+    v_mamian: '«Todos los pliegues abiertos»',
+    v_tulle: '«La purpurina es para toda la vida»',
+    v_wr: '«Yo paré. La falda, no.»',
+    v_else: '«Falda nueva. Primero la vuelta, como mandan las normas.»',
+    done: 'He hecho girar una falda nueva {t} vueltas del tirón. Supéralo:',
+    invite: 'Aquí hay una falda nueva. Ya sabes qué se hace primero:',
+    back: 'Devuélvele tus vueltas',
+    chiffon: 'Gasa', denim: 'Vaquera', mamian: 'Mamianqun', tulle: 'Tul',
+  },
+  fr: {
+    title: 'Fiche d’essayage : est-ce qu’elle tourne ?',
+    fabric: ['Tissu', '{fabric}'],
+    turns: ['D’une traite', '{t} tours'],
+    peak: ['Vitesse max.', '{p} tours par seconde'],
+    bloom: ['Grande ouverte', '{b} s'],
+    rival: ['La sienne', '{r} tours'],
+    small: 'La maison ne fournit pas de comprimés contre le mal des transports.',
+    v_dz: '« Le mannequin a le tournis. La jupe va très bien. »',
+    v_pk: '« Elle a des poches. Elles sont vides. »',
+    v_mamian: '« Tous les plis ouverts »',
+    v_tulle: '« Les paillettes, c’est pour la vie »',
+    v_wr: '« Je me suis arrêté. La jupe, non. »',
+    v_else: '« Jupe neuve. D’abord le tour, comme il se doit. »',
+    done: 'J’ai fait tourner une jupe neuve {t} fois d’une traite. À vous de faire mieux :',
+    invite: 'Il y a une jupe neuve ici. Vous savez ce qu’on fait d’abord :',
+    back: 'Renvoyez vos tours',
+    chiffon: 'Mousseline', denim: 'Denim', mamian: 'Mamianqun', tulle: 'Tulle',
+  },
+  ja: {
+    title: '試回転票',
+    fabric: ['生地', '{fabric}'],
+    turns: ['一気に', '{t} 回転'],
+    peak: ['最高速', '毎秒 {p} 回'],
+    bloom: ['全開', '{b} 秒'],
+    rival: ['相手', '{r} 回転'],
+    small: '当店に酔い止めの用意はございません。',
+    v_dz: '「トルソーは目を回した。スカートは無事」',
+    v_pk: '「ポケット付き。中身は飛んでいった」',
+    v_mamian: '「ひだ全開」',
+    v_tulle: '「ラメは一生もの」',
+    v_wr: '「私は止まった。スカートは止まらなかった」',
+    v_else: '「新しいスカート。決まりどおり、まず回った」',
+    done: '新しいスカートを一気に {t} 回転させた。超えてみて：',
+    invite: 'ここに新しいスカートがある。まず何をするかは、わかるよね：',
+    back: '回転数を送り返す',
+    chiffon: 'シフォン', denim: 'デニム', mamian: '馬面裙', tulle: 'チュール',
+  },
+} satisfies Record<Locale, Record<string, string | string[]>>
+/** twirl's skirts, in the order the link's `f` numbers them */
+export const TWIRL_FABRICS = ['chiffon', 'denim', 'mamian', 'tulle'] as const
 
 /** pop and void: a recipient answers with their own time */
 const TIME_BACK: Record<Locale, string> = { en: 'Send your time back', 'zh-CN': '把成绩甩回去', es: 'Devuélvele tu tiempo', fr: 'Renvoyer votre temps', ja: 'タイムを送り返す' }
@@ -943,6 +1080,7 @@ const LOOKS: Partial<Record<ToyId, Look>> = {
   purr: { surface: ['#E4CFB6', '#D6BD9F'], grain: 'rgba(120,84,56,0.08)', paper: '#FFFCF5', ink: '#3B2E24', faint: 'rgba(59,46,36,0.5)', accent: '#3B2E24', accent2: 'rgba(59,46,36,0.3)' },
   squish: { surface: ['#FBE1E6', '#F1CDD4'], grain: 'rgba(160,90,100,0.06)', paper: '#FFFBF3', ink: '#5A3B2A', faint: 'rgba(90,59,42,0.5)', accent: '#6B4A2E', accent2: 'rgba(107,74,46,0.3)' },
   scratch: { surface: ['#1d4a38', '#0f2a20'], grain: 'rgba(255,255,255,0.03)', paper: '#FFF8E7', ink: '#2A2418', faint: 'rgba(42,36,24,0.5)', accent: '#8A6A12', accent2: 'rgba(138,106,18,0.4)' },
+  twirl: { surface: ['#EFE6DA', '#E2D5C3'], grain: 'rgba(110,80,50,0.05)', paper: '#FFFDF9', ink: '#3A2F2A', faint: 'rgba(58,47,42,0.5)', accent: '#D9728A', accent2: 'rgba(217,114,138,0.35)' },
   yoink: { surface: ['#E9DCC8', '#D9C6AA'], grain: 'rgba(90,60,30,0.05)', paper: '#FFFDF7', ink: '#3A1E14', faint: 'rgba(58,30,20,0.5)', accent: '#B3261E', accent2: 'rgba(179,38,30,0.35)' },
   peel: { surface: ['#ECE7DF', '#DCD5CA'], grain: 'rgba(80,70,60,0.05)', paper: '#FFFFFF', ink: '#26302A', faint: 'rgba(38,48,42,0.5)', accent: '#2E7D32', accent2: 'rgba(46,125,50,0.35)' },
 }
@@ -967,9 +1105,11 @@ export function shareUrl(toy: ToyId, method?: Method): string {
   else if ((toy === 'smash' || toy === 'knock' || toy === 'stamp') && stats.words?.length) q = `?w=${encodeWords(stats.words)}`
   else if (toy === 'purr') q = catQuery(stats.name || '', stats.coat || '')
   else if (toy === 'squish') q = bunQuery(stats.name || '', stats.skin || '')
-  // pop and void carry the sender's time as a challenge; every peel link starts on the remote
+  // pop and void carry the sender's time as a challenge; a peel link starts on the object left for the recipient
   else if ((toy === 'pop' || toy === 'void') && store.done && store.peak?.data.s) q = `?t=${store.peak.data.s}`
-  else if (toy === 'peel') q = '?obj=remote'
+  else if (toy === 'peel') q = `?obj=${peelLeft()}`
+  // twirl carries the sender's turns as a challenge, and the skirt
+  else if (toy === 'twirl' && store.done && (store.peak?.data.t ?? 0) >= 5) q = `?k=${Math.min(999, store.peak!.data.t)}&f=${store.peak!.data.f ?? 0}`
   // yoink: the table and the sender's breakage, two digits
   else if (toy === 'yoink' && store.done && store.peak?.data.set) q = `?b=${store.peak.data.set}${Math.min(9, store.peak.data.k ?? 0)}`
   const base = `https://${toy}.integ.life/${q && GIFT_PAGE.includes(toy) ? 'g/' : ''}`
@@ -1047,7 +1187,12 @@ export function shareText(toy: ToyId): string {
     }
     case 'peel': {
       const T = PEEL[locale]
-      return store.done && n ? fill(T.done, { n }) : T.invite
+      return store.done && n ? fill(n === 1 ? T.done1 : T.done, { n, obj: tx(`peel_name_${peelLeft()}`) }) : T.invite
+    }
+    case 'twirl': {
+      const T = TWIRL[locale]
+      const p = store.peak?.data
+      return store.done && p?.t ? fill(T.done, { t: p.t }) : T.invite
     }
     case 'yoink': {
       const T = YOINK[locale]
@@ -1067,6 +1212,7 @@ export function primaryLabel(toy: ToyId) {
   if (!landing.recipient) return S.primary
   if (toy === 'scratch' && store.peak?.data.gift) return SCRATCH[locale].primary
   if ((toy === 'pop' || toy === 'void') && store.done && store.peak?.data.s) return TIME_BACK[locale]
+  if (toy === 'twirl' && store.done && (store.peak?.data.t ?? 0) >= 5) return TWIRL[locale].back
   if (toy === 'yoink' && store.done && yoinkRival()) return YOINK[locale].back
   return toy === 'purr' ? PURR[locale].reply : S.reply
 }
@@ -1089,13 +1235,15 @@ export const shareExtra = (toy: ToyId): Record<string, number> =>
       : toy === 'scratch'
         ? { cards: stats.n ?? 0, wins: stats.k ?? 0 }
         : toy === 'peel' && stats.n
-          ? { peels: stats.n }
+          ? { peels: stats.n, kinds: store.peak?.data.d ?? 0 }
           : toy === 'pour'
             ? { total: stats.n ?? 0, golden: stats.k ?? 0 }
             : toy === 'stamp'
               ? { total: stats.n ?? 0, denied: stats.k ?? 0 }
               : toy === 'zip' && stats.n
                 ? { total: stats.n }
+                : toy === 'twirl' && store.peak
+                  ? { turns: store.peak.data.t ?? 0, peak: store.peak.data.p ?? 0, f: store.peak.data.f ?? 0 }
                 : toy === 'yoink'
                   ? { pulls: stats.n ?? 0, perfects: stats.k ?? 0, set: store.peak?.data.set ?? 0 }
                 : toy === 'purr' && store.peak
@@ -1212,14 +1360,37 @@ function voidDoc(p: Record<string, number> | null): Doc {
   return { look: look('void'), title: T.title, rows, focus: 0.5, verdict, small: T.small, call: S.call, host: 'void.integ.life' }
 }
 
+/** A twirl challenge link's turns (`k`, 5 to 999); 0 when absent, not a recipient, or out of range. */
+export function rivalTurns(): number {
+  if (!landing.recipient) return 0
+  const v = Number(new URLSearchParams(location.search).get('k'))
+  return Number.isInteger(v) && v >= 5 && v <= 999 ? v : 0
+}
+
+function twirlDoc(p: Record<string, number> | null): Doc {
+  const T = TWIRL[locale]
+  const f = TWIRL_FABRICS[p?.f ?? 0] ?? 'chiffon'
+  const rows: [string, string][] = [[T.fabric[0], fill(T.fabric[1], { fabric: T[f] })]]
+  if (p?.t) rows.push([T.turns[0], fill(T.turns[1], { t: p.t })])
+  if (p?.p) rows.push([T.peak[0], fill(T.peak[1], { p: (p.p / 10).toFixed(1) })])
+  const r = p?.r || rivalTurns()
+  if (r) rows.push([T.rival[0], fill(T.rival[1], { r })])
+  else if (p?.b) rows.push([T.bloom[0], fill(T.bloom[1], { b: (p.b / 10).toFixed(1) })])
+  const verdict = p?.dz ? T.v_dz : p?.pk ? T.v_pk : f === 'mamian' && p?.b ? T.v_mamian : f === 'tulle' ? T.v_tulle : p?.wr ? T.v_wr : T.v_else
+  return { look: look('twirl'), title: T.title, rows, focus: f === 'mamian' ? 0.5 : 0.37, verdict, small: T.small, call: S.call, host: 'twirl.integ.life' }
+}
+
 function peelDoc(p: Record<string, number> | null): Doc {
   const T = PEEL[locale]
   const n = p?.n ?? stats.n ?? 0
   const rows: [string, string][] = []
   if (n) rows.push([T.today[0], fill(T.today[1], { n })])
   if (p?.k) rows.push([T.one[0], fill(T.one[1], { k: p.k })])
+  if (p?.d && p.d >= 4) rows.push([T.kinds[0], fill(T.kinds[1], { d: p.d, t: PEEL_LIVE })])
   rows.push([T.mum[0], T.mum[1]])
-  const verdict = p?.remote ? T.v_remote : p?.k ? T.v_one : T.v_else
+  const it = p?.it !== undefined ? PEEL_ITEMS[p.it] : undefined
+  const vi = it ? (T as Record<string, unknown>)[`v_${it}`] : undefined
+  const verdict = p?.remote ? T.v_remote : typeof vi === 'string' ? vi : p?.k ? T.v_one : T.v_else
   return { look: look('peel'), title: T.title, rows, focus: 0.5, verdict, small: T.small, call: S.call, host: 'peel.integ.life' }
 }
 
@@ -1255,6 +1426,7 @@ export function buildDoc(toy: ToyId, peak: Peak | null): Doc {
   if (toy === 'pop') return popDoc(p)
   if (toy === 'void') return voidDoc(p)
   if (toy === 'peel') return peelDoc(p)
+  if (toy === 'twirl') return twirlDoc(p)
   if (toy === 'yoink') return yoinkDoc(p)
   return (toy === 'scratch' && scratchDoc(p)) || defaultDoc(toy)
 }

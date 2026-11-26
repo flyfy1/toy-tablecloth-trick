@@ -144,6 +144,22 @@ export const IconZip = () => (
   </svg>
 )
 
+/** twirl: a skirt flaring out from its waistband. */
+export const IconTwirl = () => (
+  <svg {...S}>
+    <path d="M9 5h6" />
+    <path d="M9 5 3.5 17q8.5 3 17 0L15 5" />
+    <path d="M12 5.5v13M9.5 6 7 18.5M14.5 6l2.5 12.5" />
+  </svg>
+)
+
+/** yoink: a table, one cup left standing, the cloth flying off to the side. */
+export const IconYoink = () => (
+  <svg {...S}>
+    <path d="M3 14h13M5 14v6m9-6v6M9 14v-3h4v3m3 0q3-1 5.5 2" />
+  </svg>
+)
+
 /** The More menu's glyphs, live toys only (the others export their glyph for their own use). */
 export const TOY_ICONS: Record<LiveId, () => JSX.Element> = {
   charge: IconCharge,
@@ -155,6 +171,8 @@ export const TOY_ICONS: Record<LiveId, () => JSX.Element> = {
   squish: IconSquish,
   scratch: IconScratch,
   peel: IconPeel,
+  twirl: IconTwirl,
+  yoink: IconYoink,
 }
 
 // ---------- knock pills ----------
