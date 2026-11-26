@@ -3,6 +3,7 @@
 // live its name stays here (i18n.ts: a toy not yet live keeps its name in its own strings.ts).
 
 const en = {
+  name_yoink: "Tablecloth Trick",
   desc_yoink:
     'A family table laid with a silk cloth: a tea cup, Mum’s bowls, Grandma’s thermos, the family heirloom. Grab the hem and flick it down. Do it fast and the cloth slides out while everything rattles and stays; do it slowly and the whole table rides over the edge. A tiny physics toy, no sign-up.',
   hint_yoink: 'Grab the hem. Flick it down, fast.',
@@ -38,6 +39,7 @@ const en = {
 }
 
 const zhCN: typeof en = {
+  name_yoink: "抽桌布",
   desc_yoink:
     '一张铺着真丝桌布的饭桌：茶杯、我妈的碗、奶奶的暖水瓶，还有传家宝。捏住垂下来的桌布边，往下猛地一抽。抽得够快，桌布唰地出来，东西晃两下还在原地；抽得慢，一桌东西跟着桌布走到桌边，一件一件掉下去。打开即玩的物理小玩具。',
   hint_yoink: '捏住桌布边，往下猛地一抽',
@@ -73,6 +75,7 @@ const zhCN: typeof en = {
 }
 
 const es: typeof en = {
+  name_yoink: "El Truco del Mantel",
   desc_yoink:
     'Una mesa familiar con un mantel de seda: una taza de té, los cuencos de mamá, el termo de la abuela, la reliquia de la familia. Agarra el borde y tira hacia abajo de golpe. Si lo haces rápido, el mantel sale y todo tiembla y se queda; si lo haces despacio, la mesa entera se va por el borde. Un juguete de física, sin registro.',
   hint_yoink: 'Agarra el borde y tira hacia abajo, de golpe',
@@ -108,6 +111,7 @@ const es: typeof en = {
 }
 
 const fr: typeof en = {
+  name_yoink: "Le Coup de la Nappe",
   desc_yoink:
     'Une table de famille avec une nappe en soie : une tasse à thé, les bols de maman, le thermos de mamie, le vase de famille. Attrapez le bord et tirez d’un coup sec vers le bas. Assez vite, la nappe file et tout tremble mais reste en place ; trop lentement, toute la table part avec elle. Un petit jouet de physique, sans inscription.',
   hint_yoink: 'Attrapez le bord et tirez vers le bas, d’un coup sec',
@@ -143,6 +147,7 @@ const fr: typeof en = {
 }
 
 const ja: typeof en = {
+  name_yoink: "テーブルクロス引き",
   desc_yoink:
     '絹のクロスをかけた家族の食卓。湯のみ、母の茶碗、祖母の魔法瓶、そして家宝。垂れた布のはしをつかんで、下へ一気に引く。速ければ布だけがするりと抜けて、食器はカタカタ揺れてその場に残る。遅ければ、食卓ごと端まで運ばれて、ひとつずつ落ちていく。登録不要の小さな物理おもちゃ。',
   hint_yoink: '布のはしをつかんで、下へ一気に引く',
