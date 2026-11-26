@@ -150,6 +150,7 @@ export class Play {
   /** lay table n: the cloth drops in, the props come down one by one, the place card */
   lay(n: number, instant = false) {
     const w = this.world
+    this.holdUntil = -1
     if (!this.redo) this.messes = 0
     this.set = n
     this.count++
@@ -447,8 +448,13 @@ export class Play {
 
   /** the world time to lay the next table on its own (1.6 s after everything came to rest) */
   autoNextDue(): boolean {
-    return this.state === 'done' && this.nextAt < 0 && this.t >= 1.6
+    return this.state === 'done' && this.nextAt < 0 && this.t >= Math.max(1.6, this.holdUntil)
   }
+  /** a tap on the shards (a portal object): the table stays up to `s` more seconds, or until a tap elsewhere */
+  hold(s: number) {
+    if (this.state === 'done') this.holdUntil = this.t + s
+  }
+  private holdUntil = -1
 
   // ---------- the cat (tablecloth.md 5.6) ----------
 

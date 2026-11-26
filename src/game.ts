@@ -11,7 +11,7 @@ import type { PropId } from './model/props'
 import * as snd from './sound'
 import { act, track } from './analytics'
 import { tx } from './i18n'
-import { live, peakEvery, sharePeak, stats } from './share'
+import { live, offer, peakEvery, sharePeak, stats } from './share'
 
 export interface GameHooks {
   onFirst(): void
@@ -596,7 +596,7 @@ export function startGame(cv: HTMLCanvasElement, hooks: GameHooks) {
         flip = t > 0.3 && t < 0.6
       } else if (st === 'paw') {
         pose = 2
-      } else pose = 0
+      } else pose = performance.now() - flickAt < 260 ? 3 : 0
     }
     if (!flip) flip = false
     for (const l of looks) if (l.exitT >= 0) z += 2.2 * Math.min(1, l.exitT / 0.3) ** 2 / looks.length
@@ -756,6 +756,22 @@ export function startGame(cv: HTMLCanvasElement, hooks: GameHooks) {
     }
     return null
   }
+  // portals: the cat waiting on a set table (to purr), the shards of Mum's bowls on the floor (to smash)
+  let flickAt = -1e9
+  const catAt = (): [number, number] | null => {
+    const c = play.cat
+    if (!c || play.state !== 'ready' || play.catState !== 'loaf') return null
+    const s = cam.project(c.x, c.y, 0)
+    return [s[0], s[1] - c.c.h * cam.scale(s[2]) * CAT_VIS]
+  }
+  const bowlShards = () => (play.state === 'done' ? shards.filter((s) => s.id === 'bowls' && s.bounced && !s.roll && s.alpha >= 1).map((s) => ({ s, p: cam.project(s.x, s.y, s.z) })) : [])
+  /** a shard of the bowls on screen (tests) */
+  const bowlAt = (): [number, number] | null => {
+    const b = bowlShards().find((x) => x.p[0] > 40 && x.p[0] < cam.w - 40 && x.p[1] > 80 && x.p[1] < innerHeight - 100)
+    return b ? [b.p[0], b.p[1]] : null
+  }
+  // (tests: where the portal objects are now)
+  if (import.meta.env.DEV) Object.assign(harness, { catAt, bowlAt, shards: () => shards })
   const onDown = (e: PointerEvent) => {
     if (down) return
     snd.unlock()
@@ -764,6 +780,19 @@ export function startGame(cv: HTMLCanvasElement, hooks: GameHooks) {
       hooks.onFirst()
     }
     stamp = performance.now()
+    // the waiting cat (in front of the props it sits by): a tap flicks an ear (only that); the 2nd may show the bubble
+    const ca = catAt()
+    const c = play.cat
+    if (ca && c) {
+      const s = cam.project(c.x, c.y, 0)
+      // (its box takes in the plate it sits by: over a prop, only its head and back count as the cat)
+      const onCat = Math.abs(e.clientX - s[0]) < c.c.w * 0.5 * cam.scale(s[2]) * CAT_VIS + 6 && e.clientY < s[1] + 8 && e.clientY > ca[1] - 6
+      if (onCat && (!hitProp(e.clientX, e.clientY) || e.clientY < ca[1] + (s[1] - ca[1]) * 0.55)) {
+        flickAt = performance.now()
+        offer('yoink', 'cat', catAt)
+        return
+      }
+    }
     // a touch on a prop rocks it a degree (and saves it from the cat's paw)
     const l = hitProp(e.clientX, e.clientY)
     if (l) {
@@ -782,6 +811,17 @@ export function startGame(cv: HTMLCanvasElement, hooks: GameHooks) {
       cv.setPointerCapture?.(e.pointerId)
       snd.pinch()
       haptic(8)
+      return
+    }
+    // the bowls' shards: they clink and shift, and the table stays (up to 8 s more); the 2nd tap may show the bubble
+    const hit = bowlShards().filter((x) => Math.hypot(x.p[0] - e.clientX, x.p[1] - e.clientY) < 34)
+    if (hit.length) {
+      for (const { s } of hit) s.rot += (Math.random() - 0.5) * 0.5 // not rnd(): the seeded sequence stays as it was
+      snd.clink('bowls', 0.12)
+      haptic(6)
+      play.hold(8)
+      const s0 = hit[0].s
+      offer('yoink', 'bowl', () => (play.state === 'done' && shards.includes(s0) ? (cam.project(s0.x, s0.y, s0.z).slice(0, 2) as [number, number]) : null))
       return
     }
     // the table is done: a tap lays the next one at once

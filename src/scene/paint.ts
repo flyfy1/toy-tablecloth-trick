@@ -863,7 +863,7 @@ function heirloom(k: number, tag: string): Sprite {
 }
 
 // ---------- the cat: an orange tabby, about 0.34 long, three poses, facing left ----------
-type CatPose = 'loaf' | 'stand' | 'paw'
+type CatPose = 'loaf' | 'stand' | 'paw' | 'flick'
 function catSprite(k: number, pose: CatPose): Sprite {
   return canvas(0.24, 0.24, 0.3, 0.05, k, (g) => {
     const fur = '#E39A4B'
@@ -928,18 +928,19 @@ function catSprite(k: number, pose: CatPose): Sprite {
       }
     }
     const head = (hx: number, hy: number, eyes: 'half' | 'open') => {
-      // ears
+      // ears (flick: the far one swivels out flat for a moment)
       for (const s of [-1, 1]) {
+        const f = pose === 'flick' && s === 1
         g.beginPath()
         g.moveTo(hx + s * 0.022, hy - 0.03)
-        g.lineTo(hx + s * 0.04, hy - 0.068)
+        g.lineTo(hx + s * (f ? 0.07 : 0.04), hy - (f ? 0.05 : 0.068))
         g.lineTo(hx + s * 0.05, hy - 0.022)
         g.closePath()
         g.fillStyle = fur
         g.fill()
         g.beginPath()
         g.moveTo(hx + s * 0.03, hy - 0.032)
-        g.lineTo(hx + s * 0.04, hy - 0.058)
+        g.lineTo(hx + s * (f ? 0.062 : 0.04), hy - (f ? 0.046 : 0.058))
         g.lineTo(hx + s * 0.045, hy - 0.03)
         g.closePath()
         g.fillStyle = '#F2B8A8'
@@ -1008,7 +1009,7 @@ function catSprite(k: number, pose: CatPose): Sprite {
           g.stroke()
         }
     }
-    if (pose === 'loaf' || pose === 'paw') {
+    if (pose === 'loaf' || pose === 'flick' || pose === 'paw') {
       tailTip(0.19, -0.03)
       // the loaf: a long rounded body, paws tucked under
       fill(() => {
@@ -1111,7 +1112,7 @@ export function paintProp(id: PropId, k: number, tag = ''): Sprite[] {
     case 'heirloom':
       return [heirloom(k, tag)]
     case 'cat':
-      return [catSprite(k, 'loaf'), catSprite(k, 'stand'), catSprite(k, 'paw')]
+      return [catSprite(k, 'loaf'), catSprite(k, 'stand'), catSprite(k, 'paw'), catSprite(k, 'flick')]
     case 'cup':
       return [cup(k)]
     case 'bowls':

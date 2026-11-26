@@ -4,7 +4,7 @@ import { Hint } from './components/Hint'
 import { Tag } from './components/Tag'
 import { applyMeta, t, tx } from './i18n'
 import { startAnalytics, track } from './analytics'
-import { landing, trackLanding } from './share'
+import { arrive, landing, trackLanding } from './share'
 import { startGame } from './game'
 import type { Line } from './play'
 
@@ -28,6 +28,8 @@ export default function App() {
     applyMeta('yoink')
     startAnalytics('yoink')
     trackLanding()
+    // a portal visit (peel's remote): the tag only
+    arrive('yoink', ['top-14', 'bg-[#FFFDF7] text-[#3A1E14] font-medium'])
     // the lines: at most one per 2.5 s, the most important first (tablecloth.md 7); Mum's in her own bubble
     const queue: Line[] = []
     let lastLine = -1e9
@@ -110,7 +112,7 @@ export default function App() {
         </div>
       )}
       {!bare && mum && (
-        <div key={mum.id} className="yoink-mum pointer-events-none fixed inset-x-0 top-14 z-10 flex justify-center px-4 select-none">
+        <div key={mum.id} data-busy="" className="yoink-mum pointer-events-none fixed inset-x-0 top-14 z-10 flex justify-center px-4 select-none">
           <div className="max-w-[340px] rounded-2xl rounded-tl-md bg-white/95 px-3.5 py-2 text-[15px] leading-snug text-[#2B2620] shadow-[0_6px_20px_rgba(60,45,30,.18)]">
             <div className="text-[12px] font-semibold text-[#3A8DDE]">{mum.from}</div>
             {mum.text}
