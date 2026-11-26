@@ -706,6 +706,8 @@ const VOID = {
 /** void's clutter groups and returns, in the order the game numbers them for the card */
 export const VOID_ATE = ['sock', 'receipt', 'keys', 'charger', 'bubble', 'email', 'monday'] as const
 export const VOID_BACK = ['sock', 'tie', 'bud', 'umbrella'] as const
+/** yoink (tablecloth): the props that can break, in the order the card numbers them (`top` = 1 + index) */
+export const YOINK_ITEMS = ['cup', 'bowls', 'fish', 'vase', 'thermos', 'heirloom'] as const
 
 /** peel: 撕膜证明 / Certificate of Peeling. */
 const PEEL = {
@@ -820,6 +822,7 @@ const LOOKS: Partial<Record<ToyId, Look>> = {
   purr: { surface: ['#E4CFB6', '#D6BD9F'], grain: 'rgba(120,84,56,0.08)', paper: '#FFFCF5', ink: '#3B2E24', faint: 'rgba(59,46,36,0.5)', accent: '#3B2E24', accent2: 'rgba(59,46,36,0.3)' },
   squish: { surface: ['#FBE1E6', '#F1CDD4'], grain: 'rgba(160,90,100,0.06)', paper: '#FFFBF3', ink: '#5A3B2A', faint: 'rgba(90,59,42,0.5)', accent: '#6B4A2E', accent2: 'rgba(107,74,46,0.3)' },
   scratch: { surface: ['#1d4a38', '#0f2a20'], grain: 'rgba(255,255,255,0.03)', paper: '#FFF8E7', ink: '#2A2418', faint: 'rgba(42,36,24,0.5)', accent: '#8A6A12', accent2: 'rgba(138,106,18,0.4)' },
+  yoink: { surface: ['#E9DCC8', '#D9C6AA'], grain: 'rgba(90,60,30,0.05)', paper: '#FFFDF7', ink: '#3A1E14', faint: 'rgba(58,30,20,0.5)', accent: '#B3261E', accent2: 'rgba(179,38,30,0.35)' },
   peel: { surface: ['#ECE7DF', '#DCD5CA'], grain: 'rgba(80,70,60,0.05)', paper: '#FFFFFF', ink: '#26302A', faint: 'rgba(38,48,42,0.5)', accent: '#2E7D32', accent2: 'rgba(46,125,50,0.35)' },
 }
 const look = (toy: ToyId) => LOOKS[toy] ?? LOOKS.purr!
