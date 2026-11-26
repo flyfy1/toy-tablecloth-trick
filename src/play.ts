@@ -266,10 +266,31 @@ export class Play {
       return
     }
     this.stepCat(dt)
+    // the cat is solid: a prop sliding into it stops against it (the cat does not budge)
+    const c = this.cat
+    if (c && (this.catState === 'loaf' || this.catState === 'land' || this.catState === 'paw'))
+      for (const it of this.items) {
+        const p = it.prop
+        if (it.fate !== 'ok' || p === this.catPushProp) continue
+        const dx = p.x - c.x
+        const dy = p.y - c.y
+        const d = Math.hypot(dx, dy)
+        const min = CAT_R * 0.75 + p.c.rb
+        if (d >= min || d < 1e-6) continue
+        const nx = dx / d
+        const ny = dy / d
+        p.x = c.x + nx * min
+        p.y = c.y + ny * min
+        const vn = p.vx * nx + p.vy * ny
+        if (vn < 0) {
+          p.vx -= vn * nx
+          p.vy -= vn * ny
+        }
+      }
     // falls, topples, breaks
     for (const it of this.items) {
       const p = it.prop
-      if (it.fate === 'ok' && p.off) {
+      if ((it.fate === 'ok' || it.fate === 'toppled' || it.fate === 'spilled') && p.off) {
         it.fate = 'falling'
         it.offT = w.time
         this.emit({ k: 'edge', id: p.id })
