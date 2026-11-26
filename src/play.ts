@@ -1,7 +1,7 @@
 // The rules of the toy around the world (tablecloth.md 3.6, 5.5 to 5.7, 6.2, 7): which table is laid, the result
 // of a pull, what breaks and when, the cat, the near miss, and the lines. Pure TypeScript (no DOM, no GL), so the
 // threshold checks in node run the same code; the game turns its events into pictures, sounds and analytics.
-import { LAYOUTS, rng, TABLE, World, type Layout } from './sim.ts'
+import { GRIP, HEIR_GRIP, LAYOUTS, rng, TABLE, World, type Layout } from './sim.ts'
 import { Prop, type PropId } from './model/props.ts'
 
 export const ITEMS = ['cup', 'bowls', 'fish', 'vase', 'thermos', 'heirloom'] as const
@@ -186,6 +186,7 @@ export class Play {
     w.setProps(this.layout)
     this.items = w.props.map((prop) => ({ prop, fate: 'ok', offT: -1, topT: -1, byCat: false }))
     for (const it of this.items) {
+      if (it.prop.id !== 'cat') it.prop.grip = it.prop.id === 'heirloom' ? Math.min(HEIR_GRIP, GRIP[this.set - 1] ?? 1) : (GRIP[this.set - 1] ?? 1)
       it.prop.onTouch = (p, g) => this.emit({ k: 'clink', id: p.id, g })
     }
     w.asleep = false

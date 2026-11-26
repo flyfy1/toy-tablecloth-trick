@@ -67,6 +67,8 @@ export class Prop {
   hemKick = true
   /** set by the world: no flick is under way, the prop rides the cloth (stays stuck, follows it smoothly) */
   ride = false
+  /** the table's grip on this prop (scales μ_s and μ_k; set per table, the difficulty curve) */
+  grip = 1
   touches = 0 // rock touch-downs (the rattle)
   onTouch: ((p: Prop, g: number) => void) | null = null
 
@@ -113,7 +115,9 @@ export class Prop {
       if (this.on) this.on = cloth.sample(this.x, this.y, this.c.rb, tmp)
       return
     }
-    const { rb, hc, muS, muK } = this.c
+    const { rb, hc } = this.c
+    const muS = this.c.muS * this.grip
+    const muK = this.c.muK * this.grip
     const R2 = this.R2
     const wasOn = this.on
     const has = this.on && cloth.sample(this.x, this.y, rb, tmp)

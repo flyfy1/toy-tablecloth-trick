@@ -68,6 +68,13 @@ export const LAYOUTS: Layout[] = [
   ],
 ]
 
+/** how hard each table grips its props (multiplies every prop's μ_s and μ_k): the difficulty curve of tablecloth.md 5.8,
+ *  each table needing a faster, cleaner flick than the last. Tuned with work/thresholds.mjs; env GRIP overrides for tuning. */
+export const GRIP: number[] = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env?.GRIP?.split(',').map(Number) ?? [1, 1.6, 1.6, 1.75, 2, 2.55]
+/** the heirloom's grip is capped lower: it is the tall, narrow one, and toppling it should only need a firm pull, not a fast one
+ *  (table 6: below about 3.4 m/s it goes; the other props set how fast a perfect pull must be) */
+export const HEIR_GRIP = Number((globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env?.HG ?? 1.5)
+
 /** the phase 1 gate's wobble table: the three phase 1 props, the vase at the back with nothing in front of it */
 export const WOBBLE_LAYOUT: { id: PropId; x: number; y: number }[] = [
   { id: 'vase', x: 0.02, y: 0.86 },
