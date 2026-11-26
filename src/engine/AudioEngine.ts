@@ -201,6 +201,46 @@ class AudioEngine {
     this.noise({ dur: 0.3, gain, filter: 'bandpass', freq: 400, freqEnd: 4000, q: 2, attack: 0.08 })
   }
 
+  /** A held noise through a bandpass whose centre and level can follow something (the silk's hiss). */
+  noiseLoop(q = 0.8): { set(freq: number, gain: number): void } {
+    if (!this.ok) return { set() {} }
+    const ctx = this.ctx!
+    const src = ctx.createBufferSource()
+    src.buffer = this.noiseBuf
+    src.loop = true
+    const f = ctx.createBiquadFilter()
+    f.type = 'bandpass'
+    f.Q.value = q
+    const g = ctx.createGain()
+    g.gain.value = 0
+    src.connect(f).connect(g).connect(this.master!)
+    src.start()
+    return {
+      set(freq: number, gain: number) {
+        const t = ctx.currentTime
+        f.frequency.setTargetAtTime(Math.max(40, freq), t, 0.015)
+        g.gain.setTargetAtTime(Math.max(0, gain), t, 0.015)
+      },
+    }
+  }
+
+  /** A held sine (the slow-motion beat's 55 Hz under everything). */
+  hum(freq: number): { set(gain: number): void } {
+    if (!this.ok) return { set() {} }
+    const ctx = this.ctx!
+    const o = ctx.createOscillator()
+    o.frequency.value = freq
+    const g = ctx.createGain()
+    g.gain.value = 0
+    o.connect(g).connect(this.master!)
+    o.start()
+    return {
+      set(gain: number) {
+        g.gain.setTargetAtTime(gain, ctx.currentTime, 0.04)
+      },
+    }
+  }
+
   /** Continuous rising tension tone. set(p) with p in [0,1]. */
   riser(): Riser {
     if (!this.ok) return { set() {}, stop() {} }

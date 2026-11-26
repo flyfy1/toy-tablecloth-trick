@@ -39,6 +39,8 @@ export class Cloth {
   private flip = false
   private cn = new Float32Array(3)
   colliders: { f: Collider; muS: number; muK: number }[] = []
+  /** friction depth cap (m): see collide() */
+  dfCap = 0.001
   /** cap: max displacement per substep (0.6 of the spacing) */
   private cap: number
   contact: Uint8Array // 1 = touched the table this substep
@@ -248,7 +250,7 @@ export class Cloth {
         const { muS, muK } = cols[c]
         // friction depth capped at 1 mm: a deep push-out comes from a constraint dragging the particle
         // round the table edge, not from weight, and must not lock it there
-        const df = Math.min(d, 0.001)
+        const df = Math.min(d, this.dfCap)
         let f = 0
         if (tl < muS * df) f = 1
         else if (tl > 0) f = Math.min(1, (muK * df) / tl)

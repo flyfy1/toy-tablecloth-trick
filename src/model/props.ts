@@ -26,6 +26,10 @@ export const PROPS: Record<PropId, PropConst> = {
   cat: { rb: 0.15, hc: 0.08, muS: 0.6, muK: 0.5, w: 0.34, h: 0.2 },
 }
 
+/** the largest tilt the hem kick alone may give (rad) */
+const DEG = Math.PI / 180
+export const KICK_CAP: Record<PropId, number> = { cup: 10 * DEG, bowls: 8 * DEG, fish: 6 * DEG, vase: 10 * DEG, thermos: 10 * DEG, heirloom: 10 * DEG, cat: 0 }
+
 /** The cloth as the prop model sees it, sampled under a prop's base circle. */
 export interface ClothProbe {
   /** writes the mean cloth velocity (table plane) under the circle into out; returns false if no cloth is there */
@@ -61,6 +65,8 @@ export class Prop {
   private pvy = 0
   private primed = false
   hemKick = true
+  /** set by the world: no flick is under way, the prop rides the cloth (stays stuck, follows it smoothly) */
+  ride = false
   touches = 0 // rock touch-downs (the rattle)
   onTouch: ((p: Prop, g: number) => void) | null = null
 
@@ -80,12 +86,33 @@ export class Prop {
   }
 
   get resting() {
-    return this.off || (!this.on && this.vx === 0 && this.vy === 0 && (this.toppled || (this.th === 0 && this.om === 0)))
+    return this.off || (Math.hypot(this.vx, this.vy) < 0.003 && (this.toppled || (this.th === 0 && this.om === 0)))
+  }
+
+  /** the hem kick (tablecloth.md 5.4) for a cloth speed v; also the cat's landing thump (v = 0).
+   *  Capped (lead, phase 2): the kick alone never rocks a plate past about 6 degrees or a cup past about 10. */
+  kick(v: number) {
+    if (this.toppled || this.off || !KICK_CAP[this.id]) return
+    const { rb, hc } = this.c
+    const j = Math.max(0.15, Math.min(0.7, 0.9 - 0.14 * v))
+    const k = j * this.thc * Math.sqrt((0.75 * G * rb) / this.R2)
+    const dh = (t: number) => rb * Math.sin(t) + hc * Math.cos(t) - hc
+    const cap = Math.min(KICK_CAP[this.id], this.thc * 0.9)
+    const omMax = Math.sqrt(Math.max(0, (2 * 0.75 * G * (dh(cap) - dh(this.th))) / this.R2))
+    if (this.om < omMax) this.om = Math.min(this.om + k, omMax)
   }
 
   /** one substep; cloth gives the velocity under the base */
   step(h: number, cloth: ClothProbe, tmp: Float64Array) {
     if (this.off) return
+    // the cat (tablecloth.md 5.6): under a flick the cloth leaves from under it and it does not move at all;
+    // it only rides a slow pull (and the game has it step off before an edge)
+    if (this.id === 'cat' && !this.ride) {
+      this.vx = this.vy = 0
+      this.stuck = false
+      if (this.on) this.on = cloth.sample(this.x, this.y, this.c.rb, tmp)
+      return
+    }
     const { rb, hc, muS, muK } = this.c
     const R2 = this.R2
     const wasOn = this.on
@@ -103,7 +130,15 @@ export class Prop {
       this.pvy = this.cvy
       const ac = Math.hypot(ax, ay)
       const clothV = Math.hypot(this.cvx, this.cvy)
-      if (this.stuck && ac <= muS * G) {
+      if (this.ride && (this.stuck || Math.hypot(this.cvx - this.vx, this.cvy - this.vy) < 0.3)) {
+        // riding: the cloth's surges are smoothed (about 60 ms) and taken whole, so everything on the cloth
+        // moves together with it; rocking sees at most the grip's limit
+        const k2 = Math.min(1, h / 0.06)
+        this.stuck = true
+        this.vx += (this.cvx - this.vx) * k2
+        this.vy += (this.cvy - this.vy) * k2
+        aEff = Math.min(ac, muS * G) * ((ax * this.cvx + ay * this.cvy) > 0 ? 1 : 0)
+      } else if (this.stuck && ac <= muS * G) {
         this.vx = this.cvx
         this.vy = this.cvy
         // rocking torque while stuck: the base accelerates with the cloth (the script's max(a_c, 0))
@@ -133,12 +168,8 @@ export class Prop {
         this.vy *= ns / s
       }
     }
-    if (wasOn && !this.on && this.hemKick && this.primed) {
-      // the hem kick: a visible, safe rock as the back hem passes under
-      const v = Math.hypot(this.pvx, this.pvy)
-      const j = Math.max(0.15, Math.min(0.7, 0.9 - 0.14 * v))
-      this.om += j * this.thc * Math.sqrt((0.75 * G * rb) / R2)
-    }
+    // the hem kick: a visible, safe rock as the back hem passes under
+    if (wasOn && !this.on && this.hemKick && this.primed) this.kick(Math.hypot(this.pvx, this.pvy))
     // rocking
     if (!this.toppled) {
       const c = Math.cos(this.th)
@@ -150,12 +181,20 @@ export class Prop {
           al = 0
           this.om = Math.max(this.om, 0)
         }
-      } else al = (-0.75 * G * (rb * c - hc * s)) / R2
+      } else {
+        al = (-0.75 * G * (rb * c - hc * s)) / R2
+        // standing flat with no swing left: gravity holds it down (it must not bounce on its own weight)
+        if (this.th <= 0 && this.om <= 0) {
+          al = 0
+          this.om = 0
+        }
+      }
       this.om += al * h
       this.th += this.om * h
       if (this.th < 0) {
         this.th = 0
-        if (this.om < -0.05) {
+        // a touch-down slower than one substep of gravity is the end of the rock (no bouncing on the spot)
+        if (this.om < -Math.max(0.05, 1.5 * Math.abs(al) * h)) {
           this.touches++
           this.onTouch?.(this, -this.om)
           this.om = -0.75 * this.om

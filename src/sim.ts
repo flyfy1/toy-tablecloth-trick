@@ -28,8 +28,13 @@ const SILK_MU_S = 0.16
 const SILK_MU_K = 0.12
 const REST_MU_S = 0.7
 const REST_MU_K = 0.5
+/** below this hand speed (m/s) nobody is flicking: the props ride the cloth */
+export const RIDE_V = 1.2
 
-export const LAYOUTS: { id: PropId; x: number; y: number }[][] = [
+export type Layout = { id: PropId; x: number; y: number }[]
+
+/** the six tables (tablecloth.md 5.7); a few props moved a little so the larger pictures (VIS) do not overlap */
+export const LAYOUTS: Layout[] = [
   [{ id: 'cup', x: 0, y: 0.75 }],
   [
     { id: 'bowls', x: -0.12, y: 0.78 },
@@ -45,7 +50,7 @@ export const LAYOUTS: { id: PropId; x: number; y: number }[][] = [
     { id: 'vase', x: 0.22, y: 0.88 },
     { id: 'fish', x: -0.1, y: 0.6 },
     { id: 'bowls', x: 0.2, y: 0.72 },
-    { id: 'cup', x: -0.2, y: 0.45 },
+    { id: 'cup', x: -0.22, y: 0.4 },
   ],
   [
     { id: 'heirloom', x: 0, y: 0.9 },
@@ -54,12 +59,12 @@ export const LAYOUTS: { id: PropId; x: number; y: number }[][] = [
     { id: 'cup', x: 0, y: 0.42 },
   ],
   [
-    { id: 'heirloom', x: 0.02, y: 0.78 },
+    { id: 'heirloom', x: 0.02, y: 0.8 },
     { id: 'thermos', x: -0.26, y: 0.94 },
-    { id: 'vase', x: 0.26, y: 0.92 },
-    { id: 'fish', x: 0, y: 0.52 },
-    { id: 'bowls', x: -0.22, y: 0.64 },
-    { id: 'cup', x: 0.22, y: 0.42 },
+    { id: 'vase', x: 0.27, y: 0.93 },
+    { id: 'fish', x: -0.03, y: 0.5 },
+    { id: 'bowls', x: -0.25, y: 0.68 },
+    { id: 'cup', x: 0.24, y: 0.38 },
   ],
 ]
 
@@ -89,6 +94,7 @@ export class World {
   mesh: ClothMesh
   props: Prop[] = []
   S = 10
+  private flickT = -1
   time = 0
   rnd: () => number
   // the hand
@@ -104,6 +110,7 @@ export class World {
   private prevSide = 0
   handHist: { t: number; p: number }[] = []
   peakHandV = 0
+  followed = false
   grabTime = -1
   clothOffTime = -1
   asleep = false
@@ -254,6 +261,7 @@ export class World {
     this.cloth.dw.fill(0)
     if (v >= 1) {
       this.hand = 'follow'
+      this.followed = true
       this.handV = Math.min(v, HAND_CAP)
       this.followT = 0
     } else this.hand = 'none'
@@ -329,6 +337,11 @@ export class World {
     const f = Math.min(1, Math.max(0, (hv - 0.6) / 1.2))
     tc.muS = REST_MU_S + (SILK_MU_S - REST_MU_S) * f
     tc.muK = REST_MU_K + (SILK_MU_K - REST_MU_K) * f
+    // no flick (a slow drag, or the cloth sliding off under its own weight): the props ride it like a conveyor
+    // (tablecloth.md 5.3: a gentle pull carries everything). The cloth itself surges a little as it goes (its
+    // stretch against the table's grip); the props must not each slip on those by their own friction.
+    if (hv >= RIDE_V) this.flickT = this.time
+    const ride = this.time - this.flickT > 0.3
     const t = [0, 0, 0]
     const pinch = 1 - 0.65 * Math.min(1, this.pinchT / 0.04)
     for (let s = 0; s < S; s++) {
@@ -346,7 +359,10 @@ export class World {
         }
       }
       c.substep(h)
-      for (const p of this.props) p.step(h, this.probe, this.tmp)
+      for (const p of this.props) {
+        p.ride = ride
+        p.step(h, this.probe, this.tmp)
+      }
     }
     this.prevPull = this.pull
     this.prevSide = this.side
